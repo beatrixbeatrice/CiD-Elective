@@ -1,11 +1,215 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-charset">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Hello World</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.typekit.net/yrk5idm.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        h1 {
+font-family: "stadio-now-variable", sans-serif;
+letter-spacing: 2rem;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: #ff3366;
+            transition: background-color 0.8s ease;
+        }
+
+        .main-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(6rem, 20vw, 28rem);
+            font-weight: 900;
+            color: white;
+            text-align: center;
+            letter-spacing: -0.05em;
+            line-height: 0.85;
+            z-index: 10;
+            user-select: none;
+        }
+
+        .asterisk {
+            position: absolute;
+            font-size: 240px;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.9);
+            user-select: none;
+            z-index: 5;
+            animation: drift linear infinite;
+        }
+
+        @keyframes drift {
+            from {
+                transform: translate(0, 0);
+            }
+            to {
+                transform: translate(var(--dx), var(--dy));
+            }
+        }
+
+        .colors {
+            position: fixed;
+            bottom: 40px;
+            left: 40px;
+            display: flex;
+            gap: 20px;
+            z-index: 20;
+        }
+
+        .color-block {
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .color-block:hover {
+            transform: scale(1.1);
+        }
+
+        .color-1 { background: #ff3366; }
+        .color-2 { background: #33ff66; }
+        .color-3 { background: #3366ff; }
+        .color-4 { background: #ffff33; }
+        .color-5 { background: #ff6633; }
+        .color-6 { background: #6633ff; }
+
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            z-index: 1000;
+            pointer-events: none;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
+        }
+
+        @media (max-width: 768px) {
+            .colors {
+                bottom: 20px;
+                gap: 12px;
+            }
+            
+            .color-block {
+                width: 30px;
+                height: 30px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello World</h1>
+    <div class="cursor"></div>
+    <h1 class="main-text">HELLO<br>WORLD</h1>
+    
+    <div class="colors">
+        <div class="color-block color-1" onclick="changeColor('#ff3366')"></div>
+        <div class="color-block color-2" onclick="changeColor('#33ff66')"></div>
+        <div class="color-block color-3" onclick="changeColor('#3366ff')"></div>
+        <div class="color-block color-4" onclick="changeColor('#ffff33')"></div>
+        <div class="color-block color-5" onclick="changeColor('#ff6633')"></div>
+        <div class="color-block color-6" onclick="changeColor('#6633ff')"></div>
+    </div>
+
+    <script>
+        const cursor = document.querySelector('.cursor');
+        const body = document.body;
+        const colors = ['#ff3366', '#33ff66', '#3366ff', '#ffff33', '#ff6633', '#6633ff'];
+        let colorIndex = 0;
+
+        // Hide default cursor
+        document.body.style.cursor = 'none';
+
+        // Custom cursor
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = (e.clientX - 10) + 'px';
+            cursor.style.top = (e.clientY - 10) + 'px';
+        });
+
+        // Create floating asterisk
+        function createAsterisk() {
+            const asterisk = document.createElement('div');
+            asterisk.classList.add('asterisk');
+            asterisk.textContent = '*';
+            
+            // Random starting position - avoid center text area
+            let x, y;
+            do {
+                x = Math.random() * (window.innerWidth - 240);
+                y = Math.random() * (window.innerHeight - 240);
+            } while (
+                x > window.innerWidth * 0.15 && x < window.innerWidth * 0.85 &&
+                y > window.innerHeight * 0.25 && y < window.innerHeight * 0.75
+            );
+            
+            asterisk.style.left = x + 'px';
+            asterisk.style.top = y + 'px';
+            
+            // Slow, gentle movement
+            const dx = (Math.random() - 0.5) * window.innerWidth * 0.8;
+            const dy = (Math.random() - 0.5) * window.innerHeight * 0.8;
+            const duration = Math.random() * 25 + 20; // Very slow
+            
+            asterisk.style.setProperty('--dx', dx + 'px');
+            asterisk.style.setProperty('--dy', dy + 'px');
+            asterisk.style.animationDuration = duration + 's';
+            
+            // Change direction when animation repeats
+            asterisk.addEventListener('animationiteration', () => {
+                asterisk.style.setProperty('--dx', (Math.random() - 0.5) * window.innerWidth * 0.8 + 'px');
+                asterisk.style.setProperty('--dy', (Math.random() - 0.5) * window.innerHeight * 0.8 + 'px');
+            });
+            
+            document.body.appendChild(asterisk);
+        }
+
+        // Change background color
+        function changeColor(color) {
+            body.style.backgroundColor = color;
+        }
+
+        // Auto color change
+        function autoColorChange() {
+            colorIndex = (colorIndex + 1) % colors.length;
+            body.style.backgroundColor = colors[colorIndex];
+        }
+
+        // Create initial asterisk
+        createAsterisk();
+
+        // Auto change colors every 3 seconds
+        setInterval(autoColorChange, 3000);
+
+        // Click anywhere to add asterisk
+        document.addEventListener('click', (e) => {
+            if (!e.target.classList.contains('color-block')) {
+                createAsterisk();
+            }
+        });
+
+        // Keyboard interaction
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                autoColorChange();
+                createAsterisk();
+            }
+        });
+    </script>
 </body>
 </html>
